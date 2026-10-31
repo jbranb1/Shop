@@ -4,15 +4,19 @@ Este documento resume el propósito y el funcionamiento de `index.html` para fac
 
 ## Propósito
 
-`index.html` implementa una interfaz web de administración para una tienda de ropa llamada **Nathaly Shop**. Permite registrar prendas, mantener catálogos de tallas y materiales, y consultar el inventario desde el mismo navegador.
+`index.html` implementa una interfaz web de administración para una tienda de ropa llamada **Nathaly Shop**. Permite iniciar sesión en cuentas locales, asignar módulos, registrar prendas, mantener catálogos de tallas y materiales y consultar inventario y ventas desde el mismo navegador.
 
-Es una aplicación de una sola página: el HTML, los estilos CSS y la lógica JavaScript están dentro del mismo archivo. No hay servidor, API, base de datos ni autenticación implementados.
+Es una aplicación de una sola página: el HTML, los estilos CSS y la lógica JavaScript están dentro del mismo archivo. No hay servidor, API ni base de datos remota. La autenticación y los permisos son solo un prototipo local del lado del cliente y no protegen información ante alguien con acceso al navegador o al archivo.
 
 ## Interfaz
 
 - La página está en español y usa `lang="es"`.
 - Productos, Catálogos, Inventario y Ventas se muestran como pantallas separadas dentro de la aplicación; la navegación lateral cambia de vista y la URL/hash se actualiza para permitir navegación atrás/adelante. La pantalla de Productos también incluye el listado de productos; ambas tablas comparten los datos, contadores y búsqueda sincronizada.
 - El enlace Resumen abre la misma pantalla de Productos, ya que no hay un tablero de resumen independiente implementado.
+- La aplicación presenta un inicio de sesión en cada recarga. En la primera ejecución se configura una cuenta administradora con acceso a todos los módulos.
+- Administración de usuarios permite crear cuentas con contraseñas temporales aleatorias (formato `XXXXX-XXXXX-XXXX`, sin caracteres ambiguos), mostradas una sola vez en un recuadro con botón para copiar; exige su cambio al primer inicio, asignar o modificar los módulos permitidos y reiniciar contraseñas (que también genera una temporal). Los módulos disponibles son Productos, Catálogos, Inventario, Ventas y Administración de usuarios. Debe permanecer al menos una cuenta con permiso de administración.
+- Las contraseñas se almacenan como derivaciones PBKDF2-SHA-256 con sal aleatoria; las cuentas y módulos se guardan en `localStorage` (`nathalyShopUsersV1`). Esta medida no convierte el prototipo en autenticación segura: el control de acceso se ejecuta en el navegador y puede ser eludido. No usar contraseñas reales ni datos sensibles.
+- La configuración de cuentas requiere un contexto seguro para Web Crypto: HTTPS o `http://localhost`. No abrir el archivo como `file://`; además de impedir la autenticación criptográfica, esto bloquea los mosaicos del mapa.
 - El botón de la barra superior permite ocultar o mostrar la barra lateral; al ocultarla, el contenido principal ocupa todo el ancho. En móviles, la navegación permanece fijada a la izquierda y se superpone al contenido, manteniendo accesible la barra superior. La barra inicia visible y el estado no se conserva al recargar.
 - El diseño es adaptable a pantallas pequeñas.
 - Usa Bootstrap 5.3.3 y Bootstrap Icons 1.11.3 desde CDN.
@@ -71,6 +75,7 @@ Se usa `localStorage`:
 - `nathalyShopProductsV1`: lista de productos, incluidas las imágenes convertidas a data URLs.
 - `nathalyShopCatalogsV1`: listas personalizadas de tallas y materiales.
 - `nathalyShopSalesV1`: historial de ventas y datos guardados de las facturas.
+- `nathalyShopUsersV1`: usuarios, hashes de contraseñas y módulos asignados del prototipo local.
 
 Los datos solo están disponibles en el mismo navegador y dispositivo. No se sincronizan entre usuarios ni equipos. Las imágenes como data URLs pueden ocupar bastante espacio; el código muestra un error si el navegador no puede guardar los datos.
 
@@ -92,7 +97,7 @@ Los datos solo están disponibles en el mismo navegador y dispositivo. No se sin
 ## Detalles pendientes / consideraciones
 
 - Los importes se presentan en quetzales (GTQ), de acuerdo con los campos de precio y el módulo de ventas.
-- La interfaz se presenta como un panel privado, pero no hay inicio de sesión ni control de acceso. No debe considerarse protegido.
+- El login y los permisos son únicamente una simulación local. Para proteger la aplicación realmente se necesita un backend con autenticación y autorización del lado del servidor.
 - El inventario no tiene funciones para editar o eliminar productos.
 - Los avisos de lectura inicial de productos y catálogos utilizan el área de aviso del formulario; pueden sustituirse posteriormente si se mejora el manejo de errores.
 - El registro fiscal de las facturas es local y no está conectado a SAT ni sustituye una factura electrónica autorizada.
