@@ -3,20 +3,29 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="theme-color" content="#18221f">
+	<meta name="theme-color" content="#382039">
 	<title>Productos | Nathaly Shop</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+	<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 	<style>
 		:root {
-			--ink: #18221f;
-			--muted: #71807a;
-			--line: #e2e8e4;
+			--ink: #30232d;
+			--muted: #756471;
+			--line: #e7dde4;
 			--surface: #ffffff;
-			--page: #f4f7f5;
-			--accent: #d45d43;
-			--accent-dark: #b94731;
-			--mint: #d9eee3;
+			--page: #faf7f9;
+			--accent: #7e3f70;
+			--accent-dark: #653259;
+			--accent-soft: #f1e6ee;
+			--accent-rgb: 126, 63, 112;
+			--sidebar: #382039;
+			--sidebar-active: #573451;
+			--sidebar-muted: #c6b2c2;
+			--sidebar-text: #e8dce5;
+			--sidebar-line: #68445f;
+			--field-line: #d9cbd5;
+			--surface-soft: #fcfafb;
 		}
 
 		* { box-sizing: border-box; }
@@ -40,8 +49,8 @@
 			width: 248px;
 			flex-direction: column;
 			padding: 26px 18px 20px;
-			color: #eef3f0;
-			background: var(--ink);
+			color: var(--sidebar-text);
+			background: var(--sidebar);
 		}
 
 		.brand {
@@ -63,13 +72,13 @@
 			place-items: center;
 			border-radius: 9px;
 			color: var(--ink);
-			background: #a9d6bf;
+			background: var(--accent-soft);
 			font-size: 17px;
 		}
 
 		.sidebar-label {
 			margin: 38px 10px 10px;
-			color: #91a19a;
+			color: var(--sidebar-muted);
 			font-size: 10px;
 			font-weight: 700;
 			letter-spacing: 1.3px;
@@ -84,19 +93,20 @@
 			margin: 2px 0;
 			padding: 0 11px;
 			border-radius: 6px;
-			color: #c0cbc5;
+			color: var(--sidebar-text);
 			font-size: 13px;
 			text-decoration: none;
 		}
 
 		.side-link i { font-size: 16px; }
-		.side-link.active { color: #fff; background: #2b3933; }
-		.side-link.active i { color: #a9d6bf; }
+		.side-link:hover, .side-link:focus-visible { color: #fff; background: var(--sidebar-active); }
+		.side-link.active { color: #fff; background: var(--sidebar-active); }
+		.side-link.active i { color: var(--accent-soft); }
 
 		.sidebar-bottom {
 			margin-top: auto;
 			padding: 15px 10px 0;
-			border-top: 1px solid #34423c;
+			border-top: 1px solid var(--sidebar-line);
 		}
 
 		.account-chip { display: flex; align-items: center; gap: 10px; }
@@ -108,15 +118,17 @@
 			place-items: center;
 			border-radius: 50%;
 			color: var(--ink);
-			background: #f0b5a5;
+			background: var(--accent-soft);
 			font-size: 12px;
 			font-weight: 700;
 		}
 
-		.account-name { color: #f5f7f6; font-size: 12px; font-weight: 600; }
-		.account-role { margin-top: 2px; color: #9ba9a2; font-size: 11px; }
+		.account-name { color: #fff; font-size: 12px; font-weight: 600; }
+		.account-role { margin-top: 2px; color: var(--sidebar-muted); font-size: 11px; }
 
 		.main-area { min-height: 100vh; margin-left: 248px; }
+		.app-shell.sidebar-hidden .sidebar { display: none; }
+		.app-shell.sidebar-hidden .main-area { margin-left: 0; }
 
 		.topbar {
 			display: flex;
@@ -128,8 +140,23 @@
 			background: var(--surface);
 		}
 
+		.topbar-leading { display: flex; min-width: 0; align-items: center; gap: 14px; }
 		.breadcrumb { margin: 0; color: var(--muted); font-size: 12px; }
 		.breadcrumb strong { color: var(--ink); font-weight: 600; }
+
+		.sidebar-toggle {
+			display: inline-flex;
+			width: 36px;
+			height: 36px;
+			align-items: center;
+			justify-content: center;
+			padding: 0;
+			border: 1px solid var(--line) !important;
+			border-radius: 6px;
+			color: var(--ink) !important;
+			background: var(--surface) !important;
+		}
+		.sidebar-toggle:hover, .sidebar-toggle:focus-visible { color: var(--accent-dark) !important; background: var(--accent-soft) !important; }
 
 		.topbar-tools { display: flex; align-items: center; gap: 18px; color: var(--muted); }
 		.topbar-tools .icon-button { border: 0; color: inherit; background: transparent; font-size: 17px; }
@@ -180,7 +207,7 @@
 			border: 1px solid var(--line);
 			border-radius: 7px;
 			background: var(--surface);
-			box-shadow: 0 3px 12px rgb(24 34 31 / 3%);
+			box-shadow: 0 3px 12px rgb(56 32 57 / 3%);
 		}
 
 		.panel-heading {
@@ -197,11 +224,11 @@
 		.step-badge { color: var(--muted); font-size: 11px; }
 		.form-body { padding: 19px 20px 20px; }
 
-		.form-label { margin-bottom: 6px; color: #35423c; font-size: 11px; font-weight: 650; }
+		.form-label { margin-bottom: 6px; color: var(--ink); font-size: 11px; font-weight: 650; }
 		.form-label .required { color: var(--accent); }
-		.form-control, .form-select, .input-group-text { min-height: 39px; border-color: #d9e1dc; font-size: 12px; }
-		.form-control:focus, .form-select:focus { border-color: #8cbba0; box-shadow: 0 0 0 .2rem rgb(80 153 111 / 12%); }
-		.input-group-text { color: var(--muted); background: #f7f9f8; }
+		.form-control, .form-select, .input-group-text { min-height: 39px; border-color: var(--field-line); font-size: 12px; }
+		.form-control:focus, .form-select:focus { border-color: var(--accent); box-shadow: 0 0 0 .2rem rgba(var(--accent-rgb), .16); }
+		.input-group-text { color: var(--muted); background: var(--surface-soft); }
 		.form-hint { margin-top: 5px; color: var(--muted); font-size: 10px; }
 
 		.color-row { display: flex; gap: 8px; }
@@ -211,7 +238,7 @@
 			min-width: 42px;
 			height: 39px;
 			padding: 4px;
-			border: 1px solid #d9e1dc;
+			border: 1px solid var(--field-line);
 			border-radius: 5px;
 			background: #fff;
 		}
@@ -223,19 +250,19 @@
 			align-items: center;
 			justify-content: center;
 			padding: 14px;
-			border: 1px dashed #b9c8bf;
+			border: 1px dashed #bba4b5;
 			border-radius: 5px;
-			background: #f8fbf9;
+			background: var(--surface-soft);
 			color: var(--muted);
 			text-align: center;
 			cursor: pointer;
 			transition: border-color .15s, background .15s;
 		}
 
-		.upload-zone:hover { border-color: #6da783; background: #f1f8f4; }
-		.upload-zone.dragging { border-color: #5a9872; background: #edf7f1; }
-		.upload-zone i { margin-bottom: 5px; color: #5a9872; font-size: 20px; }
-		.upload-main { color: #35423c; font-size: 11px; font-weight: 600; }
+		.upload-zone:hover { border-color: var(--accent); background: var(--accent-soft); }
+		.upload-zone.dragging { border-color: var(--accent-dark); background: var(--accent-soft); }
+		.upload-zone i { margin-bottom: 5px; color: var(--accent); font-size: 20px; }
+		.upload-main { color: var(--ink); font-size: 11px; font-weight: 600; }
 		.upload-sub { margin-top: 3px; font-size: 10px; }
 		.preview-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 		.preview-item { position: relative; width: 54px; height: 54px; }
@@ -257,30 +284,52 @@
 
 		.form-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
 		.btn { min-height: 37px; padding: 8px 13px; border-radius: 5px; font-size: 11px; font-weight: 650; }
-		.btn-primary { border-color: var(--accent); background: var(--accent); }
+		.btn-primary {
+			--bs-btn-bg: var(--accent);
+			--bs-btn-border-color: var(--accent);
+			--bs-btn-hover-bg: var(--accent-dark);
+			--bs-btn-hover-border-color: var(--accent-dark);
+			--bs-btn-active-bg: var(--accent-dark);
+			--bs-btn-active-border-color: var(--accent-dark);
+			--bs-btn-disabled-bg: var(--accent);
+			--bs-btn-disabled-border-color: var(--accent);
+			--bs-btn-focus-shadow-rgb: var(--accent-rgb);
+			border-color: var(--accent);
+			background: var(--accent);
+		}
 		.btn-primary:hover, .btn-primary:focus { border-color: var(--accent-dark); background: var(--accent-dark); }
-		.btn-outline-secondary { border-color: #d9e1dc; color: #54615b; }
+		.btn-outline-secondary {
+			--bs-btn-hover-color: var(--accent-dark);
+			--bs-btn-hover-bg: var(--accent-soft);
+			--bs-btn-hover-border-color: var(--accent);
+			--bs-btn-active-color: var(--accent-dark);
+			--bs-btn-active-bg: var(--accent-soft);
+			--bs-btn-active-border-color: var(--accent);
+			--bs-btn-focus-shadow-rgb: var(--accent-rgb);
+			border-color: var(--field-line);
+			color: var(--muted);
+		}
 		.btn i { margin-right: 5px; }
 
 		.inventory-panel { margin-top: 20px; }
 		.inventory-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; }
-		.inventory-count { display: inline-flex; min-width: 22px; height: 22px; align-items: center; justify-content: center; margin-left: 7px; border-radius: 50%; color: #47785b; background: var(--mint); font-size: 10px; font-weight: 700; }
+		.inventory-count { display: inline-flex; min-width: 22px; height: 22px; align-items: center; justify-content: center; margin-left: 7px; border-radius: 50%; color: var(--accent-dark); background: var(--accent-soft); font-size: 10px; font-weight: 700; }
 		.search-box { position: relative; width: min(250px, 45%); }
-		.search-box i { position: absolute; top: 10px; left: 11px; color: #839088; }
+		.search-box i { position: absolute; top: 10px; left: 11px; color: var(--muted); }
 		.search-box .form-control { min-height: 35px; padding-left: 32px; }
 		.table-responsive { overflow-x: auto; }
 		.table { min-width: 650px; margin: 0; vertical-align: middle; }
-		.table thead th { padding: 11px 15px; border-bottom-color: var(--line); color: #7b8982; background: #fbfcfb; font-size: 9px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; }
-		.table tbody td { padding: 11px 15px; border-bottom-color: #edf1ee; color: #34413b; font-size: 11px; }
-		.product-photo { width: 37px; height: 42px; border-radius: 3px; object-fit: cover; background: #edf3ef; }
-		.product-placeholder { display: grid; width: 37px; height: 42px; place-items: center; border-radius: 3px; color: #7e9789; background: #edf3ef; font-size: 15px; }
+		.table thead th { padding: 11px 15px; border-bottom-color: var(--line); color: var(--muted); background: var(--surface-soft); font-size: 9px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; }
+		.table tbody td { padding: 11px 15px; border-bottom-color: var(--line); color: var(--ink); font-size: 11px; }
+		.product-photo { width: 37px; height: 42px; border-radius: 3px; object-fit: cover; background: var(--accent-soft); }
+		.product-placeholder { display: grid; width: 37px; height: 42px; place-items: center; border-radius: 3px; color: var(--accent); background: var(--accent-soft); font-size: 15px; }
 		.product-details { min-width: 0; }
 		.product-name { color: var(--ink); font-weight: 650; }
 		.product-code { margin-top: 3px; color: var(--muted); font-size: 10px; }
 		.stock-pill { display: inline-block; padding: 4px 7px; border-radius: 4px; color: #47785b; background: #e7f4ec; font-size: 10px; font-weight: 650; }
 		.stock-pill.low { color: #a15932; background: #fff0e5; }
 		.empty-state { padding: 33px 15px !important; color: var(--muted) !important; text-align: center; }
-		.empty-state i { display: block; margin-bottom: 8px; color: #9badA2; font-size: 22px; }
+		.empty-state i { display: block; margin-bottom: 8px; color: var(--accent); font-size: 22px; }
 		.notice { min-height: 20px; margin-top: 9px; color: #47785b; font-size: 11px; }
 		.notice.error { color: #b94731; }
 		.catalog-groups { display: grid; grid-template-columns: 1fr 1fr; }
@@ -288,11 +337,29 @@
 		.catalog-group + .catalog-group { border-left: 1px solid var(--line); }
 		.catalog-form { display: flex; align-items: flex-end; gap: 9px; }
 		.catalog-form .field-wrap { flex: 1; min-width: 0; }
-		.catalog-list-heading { display: flex; align-items: center; justify-content: space-between; margin-top: 19px; color: #35423c; font-size: 11px; font-weight: 650; }
+		.catalog-list-heading { display: flex; align-items: center; justify-content: space-between; margin-top: 19px; color: var(--ink); font-size: 11px; font-weight: 650; }
 		.catalog-list { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
-		.catalog-item { display: inline-flex; min-height: 29px; align-items: center; gap: 7px; padding: 3px 5px 3px 9px; border: 1px solid var(--line); border-radius: 4px; color: #35423c; background: #fbfcfb; font-size: 11px; }
+		.catalog-item { display: inline-flex; min-height: 29px; align-items: center; gap: 7px; padding: 3px 5px 3px 9px; border: 1px solid var(--line); border-radius: 4px; color: var(--ink); background: var(--surface-soft); font-size: 11px; }
 		.catalog-remove { display: grid; width: 20px; height: 20px; place-items: center; border: 0; border-radius: 3px; color: var(--muted); background: transparent; }
-		.catalog-remove:hover { color: var(--accent-dark); background: #fff0eb; }
+		.catalog-remove:hover { color: var(--accent-dark); background: var(--accent-soft); }
+		.sale-lines { display: flex; align-items: flex-end; gap: 12px; }
+		.sale-lines .field-wrap { flex: 1; min-width: 0; }
+		.sale-totals { width: min(100%, 360px); margin: 0 0 0 auto; }
+		.sale-total-row { display: flex; justify-content: space-between; gap: 16px; padding: 7px 0; color: var(--muted); font-size: 12px; }
+		.sale-total-row.grand-total { margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--ink); font-size: 15px; font-weight: 700; }
+		.sale-history-actions { white-space: nowrap; }
+		.location-picker { margin-top: 10px; }
+		.location-toolbar { display: flex; gap: 8px; }
+		.location-toolbar .search-box { flex: 1; width: auto; }
+		.location-map { height: 320px; margin-top: 10px; border: 1px solid var(--field-line); border-radius: 6px; z-index: 0; }
+		.location-results { margin: 8px 0 0; padding: 0; border: 1px solid var(--line); border-radius: 6px; list-style: none; }
+		.location-results button { width: 100%; padding: 8px 11px; border: 0; color: var(--ink); background: transparent; font-size: 12px; text-align: left; }
+		.location-results li + li { border-top: 1px solid var(--line); }
+		.location-results button:hover, .location-results button:focus-visible { background: var(--accent-soft); }
+		.invoice-print { padding: 28px; }
+		.invoice-print h2 { margin-bottom: 4px; }
+		.invoice-print table { min-width: 0; }
+		.page-screen[hidden] { display: none !important; }
 
 		@media (max-width: 1050px) {
 			.sidebar { width: 210px; }
@@ -304,15 +371,14 @@
 		}
 
 		@media (max-width: 700px) {
-			.sidebar { position: static; width: auto; min-height: auto; padding: 12px 14px; }
+			.sidebar { position: fixed; inset: 52px auto 0 0; width: min(248px, 82vw); min-height: 0; overflow-y: auto; padding: 18px 14px 14px; box-shadow: 8px 8px 24px rgb(48 35 45 / 18%); }
 			.brand { padding: 0 3px; }
-			.sidebar-label, .sidebar-bottom { display: none; }
-			.sidebar nav { display: flex; gap: 5px; margin-top: 12px; }
-			.sidebar nav { flex-wrap: wrap; }
-			.side-link { min-height: 35px; margin: 0; padding: 0 9px; font-size: 11px; }
-			.side-link i { font-size: 14px; }
+			.sidebar-label { margin-top: 30px; }
+			.sidebar nav { display: flex; flex-direction: column; gap: 2px; margin-top: 0; }
+			.side-link { min-height: 42px; margin: 0; padding: 0 11px; font-size: 13px; }
+			.side-link i { font-size: 16px; }
 			.main-area { margin-left: 0; }
-			.topbar { min-height: 52px; padding: 0 16px; }
+			.topbar { position: relative; z-index: 11; min-height: 52px; padding: 0 16px; }
 			.topbar-tools { gap: 10px; }
 			.content { padding: 25px 14px 35px; }
 			.page-heading { align-items: flex-start; flex-direction: column; margin-bottom: 19px; }
@@ -320,32 +386,43 @@
 			.summary-chip { padding: 7px 9px; }
 			.panel-heading, .form-body { padding-right: 15px; padding-left: 15px; }
 			.search-box { width: 48%; }
+			.sale-lines { align-items: stretch; flex-direction: column; }
+			.sale-lines .btn { align-self: flex-start; }
+			.sale-totals { width: 100%; }
 		}
 
 		@media (max-width: 390px) {
 			.store-status { display: none; }
-			.side-link { gap: 6px; padding: 0 7px; }
 			.panel-heading { align-items: flex-start; flex-direction: column; }
 			.inventory-heading { align-items: flex-start; }
 			.catalog-groups { grid-template-columns: 1fr; }
 			.catalog-group + .catalog-group { border-top: 1px solid var(--line); border-left: 0; }
 			.catalog-group { padding: 15px; }
 		}
+
+		@media print {
+			body.printing * { visibility: hidden !important; }
+			body.printing #invoicePrint, body.printing #invoicePrint * { visibility: visible !important; }
+			body.printing #invoicePrint { position: absolute; inset: 0; width: 100%; border: 0; box-shadow: none; }
+			body.printing #invoicePrint .no-print { display: none !important; }
+			body.printing .invoice-print { padding: 0; }
+		}
 	</style>
 </head>
 <body>
 	<div class="app-shell">
-		<aside class="sidebar" aria-label="Navegación privada">
+		<aside class="sidebar" id="sidebarNavigation" aria-label="Navegación privada">
 			<a class="brand" href="#inicio" aria-label="Nathaly Shop, panel de administración">
 				<span class="brand-mark"><i class="bi bi-scissors" aria-hidden="true"></i></span>
 				<span>Nathaly Shop</span>
 			</a>
 			<p class="sidebar-label">Administración</p>
 			<nav aria-label="Secciones">
-				<a class="side-link" href="#inicio"><i class="bi bi-grid-1x2" aria-hidden="true"></i>Resumen</a>
-				<a class="side-link active" href="#producto" aria-current="page"><i class="bi bi-tag" aria-hidden="true"></i>Productos</a>
-				<a class="side-link" href="#catalogos"><i class="bi bi-sliders" aria-hidden="true"></i>Catálogos</a>
-				<a class="side-link" href="#inventario"><i class="bi bi-box-seam" aria-hidden="true"></i>Inventario</a>
+				<a class="side-link" href="#screen-products" data-screen-link="screen-products"><i class="bi bi-grid-1x2" aria-hidden="true"></i>Resumen</a>
+				<a class="side-link active" href="#screen-products" data-screen-link="screen-products" aria-current="page"><i class="bi bi-tag" aria-hidden="true"></i>Productos</a>
+				<a class="side-link" href="#screen-catalogs" data-screen-link="screen-catalogs"><i class="bi bi-sliders" aria-hidden="true"></i>Catálogos</a>
+				<a class="side-link" href="#screen-inventory" data-screen-link="screen-inventory"><i class="bi bi-box-seam" aria-hidden="true"></i>Inventario</a>
+				<a class="side-link" href="#screen-sales" data-screen-link="screen-sales"><i class="bi bi-receipt" aria-hidden="true"></i>Ventas</a>
 			</nav>
 			<div class="sidebar-bottom">
 				<div class="account-chip">
@@ -357,7 +434,12 @@
 
 		<main class="main-area" id="inicio">
 			<header class="topbar">
-				<p class="breadcrumb">Panel privado <span class="mx-2">/</span> <strong>Productos</strong></p>
+				<div class="topbar-leading">
+					<button class="icon-button sidebar-toggle" id="sidebarToggle" type="button" aria-label="Ocultar barra lateral" aria-controls="sidebarNavigation" aria-expanded="true" title="Ocultar barra lateral">
+						<i class="bi bi-layout-sidebar-inset" aria-hidden="true"></i>
+					</button>
+					<p class="breadcrumb">Panel privado <span class="mx-2">/</span> <strong id="currentPageName">Productos</strong></p>
+				</div>
 				<div class="topbar-tools">
 					<span class="store-status"><span class="status-dot" aria-hidden="true"></span>Tienda activa</span>
 					<button class="icon-button" type="button" aria-label="Notificaciones"><i class="bi bi-bell" aria-hidden="true"></i></button>
@@ -365,10 +447,11 @@
 			</header>
 
 			<div class="content">
+				<section class="page-screen" id="screen-products" aria-labelledby="productsTitle">
 				<div class="page-heading">
 					<div>
 						<p class="eyebrow">Gestión de catálogo</p>
-						<h1>Productos</h1>
+						<h1 id="productsTitle">Productos</h1>
 						<p class="heading-note">Agrega prendas y mantén tu inventario al día.</p>
 					</div>
 					<div class="summary-chip" aria-live="polite">
@@ -455,15 +538,15 @@
 						<div class="form-body">
 							<p class="small mb-3" style="color: var(--muted)">Los campos marcados con <span class="required">*</span> son obligatorios. Las imágenes son opcionales.</p>
 							<div class="d-flex align-items-start gap-3 border-top py-3">
-								<i class="bi bi-upc-scan mt-1" style="color: #5a9872; font-size: 17px" aria-hidden="true"></i>
+								<i class="bi bi-upc-scan mt-1" style="color: var(--accent); font-size: 17px" aria-hidden="true"></i>
 								<div><div class="fw-semibold small">Código único</div><div class="form-hint mt-1">Usa un código distinto para identificar cada prenda.</div></div>
 							</div>
 							<div class="d-flex align-items-start gap-3 border-top py-3">
-								<i class="bi bi-images mt-1" style="color: #5a9872; font-size: 17px" aria-hidden="true"></i>
+								<i class="bi bi-images mt-1" style="color: var(--accent); font-size: 17px" aria-hidden="true"></i>
 								<div><div class="fw-semibold small">Fotos del producto</div><div class="form-hint mt-1">Agrega hasta cinco imágenes para reconocer el producto en el inventario.</div></div>
 							</div>
 							<div class="d-flex align-items-start gap-3 border-top py-3">
-								<i class="bi bi-box2 mt-1" style="color: #5a9872; font-size: 17px" aria-hidden="true"></i>
+								<i class="bi bi-box2 mt-1" style="color: var(--accent); font-size: 17px" aria-hidden="true"></i>
 								<div><div class="fw-semibold small">Control de existencias</div><div class="form-hint mt-1">La cantidad debe ser un número entero igual o mayor que cero.</div></div>
 							</div>
 							<div class="border-top pt-3 form-hint">Los datos se guardan en este navegador y permanecen después de cerrar la página.</div>
@@ -471,6 +554,35 @@
 					</aside>
 				</section>
 
+				<section class="panel inventory-panel products-list-panel" aria-labelledby="productsListTitle">
+					<div class="panel-heading">
+						<div class="inventory-heading">
+							<div><h2 class="panel-title" id="productsListTitle">Productos <span class="inventory-count inventory-count-value">0</span></h2><p class="panel-subtitle">Productos guardados en este navegador.</p></div>
+							<div class="search-box">
+								<i class="bi bi-search" aria-hidden="true"></i>
+								<input class="form-control inventory-search" type="search" placeholder="Buscar producto o código" aria-label="Buscar producto o código">
+							</div>
+						</div>
+					</div>
+					<div class="table-responsive">
+						<table class="table" aria-label="Productos registrados">
+							<thead><tr><th scope="col">Producto</th><th scope="col">Talla / Color</th><th scope="col">Material</th><th scope="col">Precio</th><th scope="col">Existencia</th><th scope="col">Imágenes</th></tr></thead>
+							<tbody class="inventory-rows">
+								<tr><td class="empty-state" colspan="6"><i class="bi bi-inbox" aria-hidden="true"></i>Aún no hay productos. Agrega el primero con el formulario.</td></tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
+				</section>
+
+				<section class="page-screen" id="screen-catalogs" aria-labelledby="catalogPageTitle" hidden>
+				<div class="page-heading">
+					<div>
+						<p class="eyebrow">Gestión de catálogo</p>
+						<h1 id="catalogPageTitle">Catálogos</h1>
+						<p class="heading-note">Administra las tallas y materiales disponibles para tus productos.</p>
+					</div>
+				</div>
 				<section class="panel inventory-panel" id="catalogos" aria-labelledby="catalogTitle">
 					<div class="panel-heading">
 						<div><h2 class="panel-title" id="catalogTitle">Catálogos de productos</h2><p class="panel-subtitle">Administra las opciones que aparecen en el formulario de ingreso.</p></div>
@@ -500,44 +612,227 @@
 						</section>
 					</div>
 				</section>
+				</section>
 
+				<section class="page-screen" id="screen-inventory" aria-labelledby="inventoryPageTitle" hidden>
+				<div class="page-heading">
+					<div>
+						<p class="eyebrow">Control de existencias</p>
+						<h1 id="inventoryPageTitle">Inventario</h1>
+						<p class="heading-note">Consulta y busca los productos guardados.</p>
+					</div>
+				</div>
 				<section class="panel inventory-panel" id="inventario" aria-labelledby="inventoryTitle">
 					<div class="panel-heading">
 						<div class="inventory-heading">
-							<div><h2 class="panel-title" id="inventoryTitle">Inventario <span class="inventory-count" id="inventoryCount">0</span></h2><p class="panel-subtitle">Productos guardados en este navegador.</p></div>
+							<div><h2 class="panel-title" id="inventoryTitle">Inventario <span class="inventory-count inventory-count-value">0</span></h2><p class="panel-subtitle">Productos guardados en este navegador.</p></div>
 							<div class="search-box">
 								<i class="bi bi-search" aria-hidden="true"></i>
-								<input class="form-control" id="inventorySearch" type="search" placeholder="Buscar producto o código" aria-label="Buscar producto o código">
+								<input class="form-control inventory-search" type="search" placeholder="Buscar producto o código" aria-label="Buscar producto o código">
 							</div>
 						</div>
 					</div>
 					<div class="table-responsive">
 						<table class="table" aria-label="Productos en inventario">
 							<thead><tr><th scope="col">Producto</th><th scope="col">Talla / Color</th><th scope="col">Material</th><th scope="col">Precio</th><th scope="col">Existencia</th><th scope="col">Imágenes</th></tr></thead>
-							<tbody id="inventoryRows">
-								<tr id="emptyRow"><td class="empty-state" colspan="6"><i class="bi bi-inbox" aria-hidden="true"></i>Aún no hay productos. Agrega el primero con el formulario.</td></tr>
+							<tbody class="inventory-rows">
+								<tr><td class="empty-state" colspan="6"><i class="bi bi-inbox" aria-hidden="true"></i>Aún no hay productos. Agrega el primero con el formulario.</td></tr>
 							</tbody>
 						</table>
 					</div>
+				</section>
+				</section>
+
+				<section class="page-screen" id="screen-sales" aria-labelledby="salesPageTitle" hidden>
+					<div class="page-heading">
+						<div>
+							<p class="eyebrow">Operación de tienda</p>
+							<h1 id="salesPageTitle">Venta de productos</h1>
+							<p class="heading-note">Registra una venta con productos disponibles en inventario y genera su factura.</p>
+						</div>
+					</div>
+
+					<form id="saleForm" novalidate>
+						<section class="panel inventory-panel" aria-labelledby="saleCustomerTitle">
+							<div class="panel-heading">
+								<div><h2 class="panel-title" id="saleCustomerTitle">Datos de la factura</h2><p class="panel-subtitle">El número se genera automáticamente y no se puede editar.</p></div>
+							</div>
+							<div class="form-body">
+								<div class="row g-3">
+									<div class="col-12 col-md-6">
+										<label class="form-label" for="saleInvoiceNumber">No. de factura</label>
+										<input class="form-control" id="saleInvoiceNumber" type="text" readonly aria-readonly="true">
+									</div>
+									<div class="col-12 col-md-6">
+										<label class="form-label" for="saleCompanyNit">NIT de la empresa</label>
+										<input class="form-control" id="saleCompanyNit" type="text" value="3012394280101" readonly aria-readonly="true">
+									</div>
+									<div class="col-12"><div class="form-hint">Empresa: <strong>Nathaly Shop</strong></div></div>
+									<div class="col-12 col-md-4">
+										<label class="form-label" for="saleCustomerName">Nombre del cliente <span class="required">*</span></label>
+										<input class="form-control" id="saleCustomerName" name="customerName" type="text" maxlength="100" required>
+									</div>
+									<div class="col-12 col-md-4">
+										<label class="form-label" for="saleCustomerNit">NIT del cliente <span class="required">*</span></label>
+										<input class="form-control" id="saleCustomerNit" name="customerNit" type="text" maxlength="30" required>
+									</div>
+									<div class="col-12 col-md-4">
+										<label class="form-label" for="saleCustomerAddress">Dirección del cliente <span class="required">*</span></label>
+										<input class="form-control" id="saleCustomerAddress" name="customerAddress" type="text" maxlength="250" required>
+										<div class="form-hint">Se completa al marcar el punto en el mapa; puedes editarla.</div>
+									</div>
+									<div class="col-12">
+										<div class="location-picker">
+											<span class="form-label d-block">Ubicación del cliente en el mapa</span>
+											<div class="location-toolbar">
+												<div class="search-box">
+													<i class="bi bi-search" aria-hidden="true"></i>
+													<input class="form-control" id="locationSearch" type="search" placeholder="Busca una dirección o lugar" aria-label="Buscar ubicación">
+												</div>
+												<button class="btn btn-outline-secondary" id="locationSearchButton" type="button">Buscar</button>
+												<button class="btn btn-outline-secondary" id="locationCurrent" type="button" title="Usar mi ubicación actual" aria-label="Usar mi ubicación actual"><i class="bi bi-crosshair" aria-hidden="true"></i>Mi ubicación</button>
+											</div>
+											<ul class="location-results" id="locationResults" hidden></ul>
+											<div class="location-map" id="saleMap" role="application" aria-label="Mapa para ubicar la dirección del cliente"></div>
+											<div class="form-hint" id="locationStatus" role="status" aria-live="polite">Haz clic en el mapa o arrastra el marcador para fijar la ubicación. Mapa © colaboradores de OpenStreetMap.</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</section>
+
+						<section class="panel inventory-panel" aria-labelledby="saleProductsTitle">
+							<div class="panel-heading">
+								<div><h2 class="panel-title" id="saleProductsTitle">Productos de la venta</h2><p class="panel-subtitle">Los productos, códigos, precios y existencias se toman del inventario actual.</p></div>
+							</div>
+							<div class="form-body">
+								<div class="sale-lines">
+									<div class="field-wrap">
+										<label class="form-label" for="saleProductSelect">Producto</label>
+										<select class="form-select" id="saleProductSelect">
+											<option value="">No hay productos disponibles</option>
+										</select>
+									</div>
+									<div class="field-wrap" style="max-width: 170px">
+										<label class="form-label" for="saleProductQuantity">Cantidad</label>
+										<input class="form-control" id="saleProductQuantity" type="number" min="1" step="1" value="1">
+									</div>
+									<button class="btn btn-outline-secondary" id="addSaleProduct" type="button"><i class="bi bi-plus-lg" aria-hidden="true"></i>Agregar producto</button>
+								</div>
+								<div class="notice" id="saleNotice" role="status" aria-live="polite"></div>
+								<div class="table-responsive mt-3">
+									<table class="table" aria-label="Productos incluidos en la venta">
+										<thead><tr><th scope="col">Id. producto</th><th scope="col">Producto</th><th scope="col">Cantidad</th><th scope="col">Precio unitario (IVA incluido)</th><th scope="col">Total</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
+										<tbody id="saleCartRows"><tr><td class="empty-state" colspan="6">Agrega productos disponibles para iniciar la venta.</td></tr></tbody>
+									</table>
+								</div>
+								<div class="sale-totals" aria-live="polite">
+									<div class="sale-total-row"><span>Subtotal (antes de IVA)</span><strong id="saleSubtotal">Q0.00</strong></div>
+									<div class="sale-total-row"><span>IVA incluido (12%)</span><strong id="saleVat">Q0.00</strong></div>
+									<div class="sale-total-row grand-total"><span>Total de la venta</span><strong id="saleTotal">Q0.00</strong></div>
+								</div>
+								<div class="form-actions">
+									<button class="btn btn-outline-secondary" id="clearSale" type="button"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>Limpiar venta</button>
+									<button class="btn btn-primary" id="completeSale" type="submit"><i class="bi bi-check2-circle" aria-hidden="true"></i>Registrar venta</button>
+								</div>
+							</div>
+						</section>
+					</form>
+
+					<section class="panel inventory-panel" aria-labelledby="salesHistoryTitle">
+						<div class="panel-heading">
+							<div><h2 class="panel-title" id="salesHistoryTitle">Historial de ventas</h2><p class="panel-subtitle">Facturas guardadas en este navegador.</p></div>
+						</div>
+						<div class="table-responsive">
+							<table class="table" aria-label="Historial de facturas">
+								<thead><tr><th scope="col">No. de factura</th><th scope="col">Fecha</th><th scope="col">Cliente</th><th scope="col">NIT</th><th scope="col">Total</th><th scope="col">Acciones</th></tr></thead>
+								<tbody id="salesHistoryRows"><tr><td class="empty-state" colspan="6">Aún no hay ventas registradas.</td></tr></tbody>
+							</table>
+						</div>
+					</section>
+					<section class="panel inventory-panel invoice-print" id="invoicePrint" aria-label="Factura seleccionada para impresión" hidden></section>
 				</section>
 			</div>
 		</main>
 	</div>
 
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 	<script>
 		const productForm = document.querySelector("#productForm");
 		const imageInput = document.querySelector("#productImages");
 		const previewList = document.querySelector("#imagePreview");
 		const notice = document.querySelector("#formNotice");
-		const inventoryRows = document.querySelector("#inventoryRows");
-		const searchInput = document.querySelector("#inventorySearch");
+		const inventoryRows = Array.from(document.querySelectorAll(".inventory-rows"));
+		const searchInputs = Array.from(document.querySelectorAll(".inventory-search"));
 		const productCodeInput = document.querySelector("#productCode");
+		const sidebarToggle = document.querySelector("#sidebarToggle");
+		const appShell = document.querySelector(".app-shell");
+		const pageName = document.querySelector("#currentPageName");
+		const pageScreens = Array.from(document.querySelectorAll(".page-screen"));
+		const screenLinks = Array.from(document.querySelectorAll("[data-screen-link]"));
 		const storageKey = "nathalyShopProductsV1";
 		const catalogStorageKey = "nathalyShopCatalogsV1";
+		const salesStorageKey = "nathalyShopSalesV1";
+		const saleForm = document.querySelector("#saleForm");
+		const saleNotice = document.querySelector("#saleNotice");
+		const saleProductSelect = document.querySelector("#saleProductSelect");
+		const saleProductQuantity = document.querySelector("#saleProductQuantity");
+		const saleCartRows = document.querySelector("#saleCartRows");
+		const salesHistoryRows = document.querySelector("#salesHistoryRows");
+		const invoicePrint = document.querySelector("#invoicePrint");
 		const defaultSizes = ["XS", "S", "M", "L", "XL", "XXL", "Unitalla"];
 		const defaultMaterials = ["Algodón", "Lino", "Poliéster", "Mezclilla", "Rayón", "Lana", "Otro"];
 		let products = [];
 		let selectedImages = [];
+		let sales = [];
+		let saleCart = [];
+		let currentInvoiceNumber = "";
+		let salesStorageAvailable = true;
+
+		function showCurrentScreen() {
+			const requestedScreen = window.location.hash.slice(1);
+			const activeScreen = pageScreens.some(screen => screen.id === requestedScreen) ? requestedScreen : "screen-products";
+			const activeLink = screenLinks.find(link => link.dataset.screenLink === activeScreen && link.textContent.trim() !== "Resumen");
+			const activeName = activeLink?.textContent.trim() || "Productos";
+			pageScreens.forEach(screen => {
+				screen.hidden = screen.id !== activeScreen;
+			});
+			screenLinks.forEach(link => {
+				const isActive = link === activeLink;
+				link.classList.toggle("active", isActive);
+				if (isActive) link.setAttribute("aria-current", "page");
+				else link.removeAttribute("aria-current");
+			});
+			if (activeScreen === "screen-sales" && window.saleMapReady) {
+				requestAnimationFrame(() => {
+					if (!document.querySelector("#screen-sales").hidden) initSaleMap();
+				});
+			}
+			pageName.textContent = activeName;
+			document.title = `${activeName} | Nathaly Shop`;
+		}
+
+		window.addEventListener("hashchange", showCurrentScreen);
+		showCurrentScreen();
+
+		function setSidebarExpanded(isExpanded) {
+			appShell.classList.toggle("sidebar-hidden", !isExpanded);
+			sidebarToggle.setAttribute("aria-expanded", String(isExpanded));
+			const label = isExpanded ? "Ocultar barra lateral" : "Mostrar barra lateral";
+			sidebarToggle.setAttribute("aria-label", label);
+			sidebarToggle.title = label;
+			sidebarToggle.querySelector("i").className = isExpanded ? "bi bi-layout-sidebar-inset" : "bi bi-layout-sidebar";
+		}
+
+		sidebarToggle.addEventListener("click", () => {
+			setSidebarExpanded(sidebarToggle.getAttribute("aria-expanded") !== "true");
+		});
+
+		screenLinks.forEach(link => {
+			link.addEventListener("click", () => {
+				if (window.matchMedia("(max-width: 700px)").matches) setSidebarExpanded(false);
+			});
+		});
 
 		function generateProductCode() {
 			let sequence = 1;
@@ -555,6 +850,16 @@
 		} catch {
 			notice.textContent = "No se pudo leer el inventario guardado en este navegador.";
 			notice.classList.add("error");
+		}
+		try {
+			const savedSales = JSON.parse(localStorage.getItem(salesStorageKey) || "[]");
+			if (!Array.isArray(savedSales)) throw new Error("El historial de ventas no tiene un formato válido.");
+			sales = savedSales;
+		} catch {
+			salesStorageAvailable = false;
+			saleNotice.textContent = "No se pudo leer el historial guardado. No se pueden registrar ventas para evitar sobrescribir facturas.";
+			saleNotice.classList.add("error");
+			document.querySelector("#completeSale").disabled = true;
 		}
 
 		function mergeCatalogValues(...groups) {
@@ -641,7 +946,12 @@
 		});
 
 		function formatPrice(value) {
-			return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(value);
+			return new Intl.NumberFormat("es-GT", {
+				style: "currency",
+				currency: "GTQ",
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 10
+			}).format(value);
 		}
 
 		function populateSelect(select, values) {
@@ -748,24 +1058,28 @@
 		});
 
 		function renderInventory() {
-			const query = searchInput.value.trim().toLocaleLowerCase("es-MX");
+			const query = searchInputs[0].value.trim().toLocaleLowerCase("es-MX");
 			const visibleProducts = products.filter(product => `${product.name} ${product.code}`.toLocaleLowerCase("es-MX").includes(query));
-			inventoryRows.replaceChildren();
-			document.querySelector("#inventoryCount").textContent = products.length;
+			inventoryRows.forEach(rows => rows.replaceChildren());
+			document.querySelectorAll(".inventory-count-value").forEach(count => {
+				count.textContent = products.length;
+			});
 			document.querySelector("#productTotal").textContent = `${products.length} ${products.length === 1 ? "producto" : "productos"}`;
 
 			if (visibleProducts.length === 0) {
-				const row = document.createElement("tr");
-				const cell = document.createElement("td");
-				cell.className = "empty-state";
-				cell.colSpan = 6;
-				cell.innerHTML = products.length ? "<i class=\"bi bi-search\" aria-hidden=\"true\"></i>No hay coincidencias para tu búsqueda." : "<i class=\"bi bi-inbox\" aria-hidden=\"true\"></i>Aún no hay productos. Agrega el primero con el formulario.";
-				row.append(cell);
-				inventoryRows.append(row);
+				inventoryRows.forEach(rows => {
+					const row = document.createElement("tr");
+					const cell = document.createElement("td");
+					cell.className = "empty-state";
+					cell.colSpan = 6;
+					cell.innerHTML = products.length ? "<i class=\"bi bi-search\" aria-hidden=\"true\"></i>No hay coincidencias para tu búsqueda." : "<i class=\"bi bi-inbox\" aria-hidden=\"true\"></i>Aún no hay productos. Agrega el primero con el formulario.";
+					row.append(cell);
+					rows.append(row);
+				});
 				return;
 			}
 
-			visibleProducts.forEach(product => {
+			const productRows = visibleProducts.map(product => {
 				const row = document.createElement("tr");
 				const productCell = document.createElement("td");
 				const productContent = document.createElement("div");
@@ -812,8 +1126,407 @@
 				imageCount.textContent = savedImageCount ? `${savedImageCount} ${savedImageCount === 1 ? "foto" : "fotos"}` : "—";
 
 				row.append(productCell, sizeColor, material, price, stockCell, imageCount);
-				inventoryRows.append(row);
+				return row;
 			});
+			inventoryRows.forEach(rows => {
+				rows.append(...productRows.map(row => row.cloneNode(true)));
+			});
+		}
+
+		function generateInvoiceNumber() {
+			let invoiceNumber;
+			do {
+				const randomPart = Math.floor(Math.random() * 1_000_000_000_000).toString().padStart(12, "0");
+				invoiceNumber = `NS-${new Date().getFullYear()}-${randomPart}`;
+			} while (sales.some(sale => sale.invoiceNumber === invoiceNumber));
+			return invoiceNumber;
+		}
+
+		function setSaleNotice(message, isError = false) {
+			saleNotice.textContent = message;
+			saleNotice.classList.toggle("error", isError);
+		}
+
+		function getSaleTotals() {
+			const total = saleCart.reduce((sum, item) => {
+				const product = products.find(entry => entry.code === item.code);
+				return sum + (product ? Number(product.price) * item.quantity : 0);
+			}, 0);
+			const subtotal = total / 1.12;
+			return { subtotal, vat: total - subtotal, total };
+		}
+
+		function renderSaleProducts() {
+			const availableProducts = products.filter(product =>
+				Number.isSafeInteger(product.stock) &&
+				product.stock > 0 &&
+				Number.isFinite(Number(product.price)) &&
+				Number(product.price) > 0
+			);
+			const options = availableProducts.map(product => {
+				const option = new Option(
+					`${product.code} — ${product.name} · ${product.stock} disponibles · ${formatPrice(product.price)}`,
+					product.code
+				);
+				option.disabled = saleCart.some(item => item.code === product.code);
+				return option;
+			});
+			saleProductSelect.replaceChildren(
+				new Option(options.length ? "Seleccionar producto" : "No hay productos con existencias", ""),
+				...options
+			);
+		}
+
+		function renderSaleCart() {
+			saleCartRows.replaceChildren();
+			if (saleCart.length === 0) {
+				const row = document.createElement("tr");
+				const cell = document.createElement("td");
+				cell.className = "empty-state";
+				cell.colSpan = 6;
+				cell.textContent = "Agrega productos disponibles para iniciar la venta.";
+				row.append(cell);
+				saleCartRows.append(row);
+			} else {
+				saleCart.forEach(item => {
+					const product = products.find(entry => entry.code === item.code);
+					if (!product) return;
+					const row = document.createElement("tr");
+					const codeCell = document.createElement("td");
+					codeCell.textContent = product.code;
+					const nameCell = document.createElement("td");
+					nameCell.textContent = product.name;
+					const quantityCell = document.createElement("td");
+					const quantityInput = document.createElement("input");
+					quantityInput.className = "form-control";
+					quantityInput.type = "number";
+					quantityInput.min = "1";
+					quantityInput.max = String(product.stock);
+					quantityInput.step = "1";
+					quantityInput.value = String(item.quantity);
+					quantityInput.setAttribute("aria-label", `Cantidad de ${product.name}`);
+					quantityInput.addEventListener("change", () => {
+						const quantity = Number(quantityInput.value);
+						if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > product.stock) {
+							setSaleNotice(`La cantidad de ${product.name} debe ser un entero entre 1 y ${product.stock}.`, true);
+							quantityInput.value = String(item.quantity);
+							return;
+						}
+						item.quantity = quantity;
+						setSaleNotice("");
+						renderSaleCart();
+					});
+					quantityCell.append(quantityInput);
+					const priceCell = document.createElement("td");
+					priceCell.textContent = formatPrice(product.price);
+					const totalCell = document.createElement("td");
+					totalCell.textContent = formatPrice(Number(product.price) * item.quantity);
+					const actionCell = document.createElement("td");
+					const removeButton = document.createElement("button");
+					removeButton.className = "btn btn-outline-secondary";
+					removeButton.type = "button";
+					removeButton.setAttribute("aria-label", `Quitar ${product.name} de la venta`);
+					removeButton.innerHTML = "<i class=\"bi bi-trash\" aria-hidden=\"true\"></i>";
+					removeButton.addEventListener("click", () => {
+						saleCart = saleCart.filter(cartItem => cartItem.code !== item.code);
+						renderSaleProducts();
+						renderSaleCart();
+					});
+					actionCell.append(removeButton);
+					row.append(codeCell, nameCell, quantityCell, priceCell, totalCell, actionCell);
+					saleCartRows.append(row);
+				});
+			}
+
+			const totals = getSaleTotals();
+			document.querySelector("#saleSubtotal").textContent = formatPrice(totals.subtotal);
+			document.querySelector("#saleVat").textContent = formatPrice(totals.vat);
+			document.querySelector("#saleTotal").textContent = formatPrice(totals.total);
+		}
+
+		function addSaleProduct() {
+			const code = saleProductSelect.value;
+			const product = products.find(entry => entry.code === code);
+			const quantity = Number(saleProductQuantity.value);
+			if (!product) {
+				setSaleNotice("Selecciona un producto disponible en el inventario.", true);
+				return;
+			}
+			if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > product.stock) {
+				setSaleNotice(`La cantidad debe ser un entero entre 1 y ${product.stock}.`, true);
+				saleProductQuantity.focus();
+				return;
+			}
+			if (saleCart.some(item => item.code === code)) {
+				setSaleNotice("Ese producto ya está en la venta. Modifica su cantidad en la tabla.", true);
+				return;
+			}
+			saleCart.push({ code, quantity });
+			saleProductQuantity.value = "1";
+			setSaleNotice("");
+			renderSaleProducts();
+			renderSaleCart();
+		}
+
+		function renderSalesHistory() {
+			salesHistoryRows.replaceChildren();
+			if (!salesStorageAvailable) {
+				const row = document.createElement("tr");
+				const cell = document.createElement("td");
+				cell.className = "empty-state";
+				cell.colSpan = 6;
+				cell.textContent = "No se pudo cargar el historial de ventas guardado.";
+				row.append(cell);
+				salesHistoryRows.append(row);
+				return;
+			}
+			if (sales.length === 0) {
+				const row = document.createElement("tr");
+				const cell = document.createElement("td");
+				cell.className = "empty-state";
+				cell.colSpan = 6;
+				cell.textContent = "Aún no hay ventas registradas.";
+				row.append(cell);
+				salesHistoryRows.append(row);
+				return;
+			}
+			sales.forEach(sale => {
+				const row = document.createElement("tr");
+				[
+					sale.invoiceNumber,
+					new Date(sale.createdAt).toLocaleString("es-GT"),
+					sale.customer.name,
+					sale.customer.nit,
+					formatPrice(sale.totals.total)
+				].forEach(value => {
+					const cell = document.createElement("td");
+					cell.textContent = value;
+					row.append(cell);
+				});
+				const actionCell = document.createElement("td");
+				actionCell.className = "sale-history-actions";
+				const printButton = document.createElement("button");
+				printButton.className = "btn btn-outline-secondary";
+				printButton.type = "button";
+				printButton.dataset.invoiceNumber = sale.invoiceNumber;
+				printButton.innerHTML = "<i class=\"bi bi-printer\" aria-hidden=\"true\"></i>Imprimir";
+				actionCell.append(printButton);
+				row.append(actionCell);
+				salesHistoryRows.append(row);
+			});
+		}
+
+		function renderInvoice(sale) {
+			const content = document.createElement("div");
+			content.className = "invoice-print";
+			const heading = document.createElement("div");
+			heading.className = "d-flex justify-content-between align-items-start gap-3 mb-4";
+			const company = document.createElement("div");
+			const companyName = document.createElement("h2");
+			companyName.textContent = sale.company.name;
+			const companyNit = document.createElement("p");
+			companyNit.className = "mb-0";
+			companyNit.textContent = `NIT: ${sale.company.nit}`;
+			company.append(companyName, companyNit);
+			const invoiceMeta = document.createElement("div");
+			invoiceMeta.className = "text-end";
+			const invoiceNumber = document.createElement("strong");
+			invoiceNumber.textContent = `Factura ${sale.invoiceNumber}`;
+			const invoiceDate = document.createElement("div");
+			invoiceDate.textContent = new Date(sale.createdAt).toLocaleString("es-GT");
+			invoiceMeta.append(invoiceNumber, invoiceDate);
+			heading.append(company, invoiceMeta);
+			content.append(heading);
+
+			const customer = document.createElement("div");
+			customer.className = "mb-4";
+			const customerHeading = document.createElement("h3");
+			customerHeading.className = "panel-title";
+			customerHeading.textContent = "Datos del cliente";
+			const customerDetails = document.createElement("p");
+			customerDetails.className = "mb-0";
+			const coordinates = sale.customer.location
+				? ` · Coordenadas: ${sale.customer.location.lat.toFixed(6)}, ${sale.customer.location.lng.toFixed(6)}`
+				: "";
+			customerDetails.textContent = `${sale.customer.name} · NIT: ${sale.customer.nit} · ${sale.customer.address}${coordinates}`;
+			customer.append(customerHeading, customerDetails);
+			content.append(customer);
+
+			const tableWrapper = document.createElement("div");
+			tableWrapper.className = "table-responsive";
+			const table = document.createElement("table");
+			table.className = "table";
+			const tableHead = document.createElement("thead");
+			const headerRow = document.createElement("tr");
+			["Id. producto", "Producto", "Cantidad", "Precio unitario", "Total"].forEach(label => {
+				const cell = document.createElement("th");
+				cell.scope = "col";
+				cell.textContent = label;
+				headerRow.append(cell);
+			});
+			tableHead.append(headerRow);
+			const tableBody = document.createElement("tbody");
+			sale.items.forEach(item => {
+				const row = document.createElement("tr");
+				[item.productId, item.productName, String(item.quantity), formatPrice(item.unitPrice), formatPrice(item.lineTotal)].forEach(value => {
+					const cell = document.createElement("td");
+					cell.textContent = value;
+					row.append(cell);
+				});
+				tableBody.append(row);
+			});
+			table.append(tableHead, tableBody);
+			tableWrapper.append(table);
+			content.append(tableWrapper);
+
+			const totals = document.createElement("div");
+			totals.className = "sale-totals mt-4";
+			[
+				["Subtotal (antes de IVA)", formatPrice(sale.totals.subtotal)],
+				["IVA incluido (12%)", formatPrice(sale.totals.vat)],
+				["Total", formatPrice(sale.totals.total)]
+			].forEach(([label, value], index) => {
+				const line = document.createElement("div");
+				line.className = `sale-total-row${index === 2 ? " grand-total" : ""}`;
+				const lineLabel = document.createElement("span");
+				lineLabel.textContent = label;
+				const lineValue = document.createElement("strong");
+				lineValue.textContent = value;
+				line.append(lineLabel, lineValue);
+				totals.append(line);
+			});
+			content.append(totals);
+
+			const printButton = document.createElement("button");
+			printButton.className = "btn btn-primary no-print mt-4";
+			printButton.type = "button";
+			printButton.innerHTML = "<i class=\"bi bi-printer\" aria-hidden=\"true\"></i>Imprimir factura";
+			printButton.addEventListener("click", () => printSaleInvoice(sale));
+			content.append(printButton);
+			invoicePrint.replaceChildren(content);
+			invoicePrint.hidden = false;
+		}
+
+		function printSaleInvoice(sale) {
+			renderInvoice(sale);
+			document.body.classList.add("printing");
+			window.print();
+			document.body.classList.remove("printing");
+		}
+
+		function persistSale(updatedProducts, updatedSales) {
+			let previousProducts;
+			let previousSales;
+			let snapshotsRead = false;
+			let salesWritten = false;
+			let productsWritten = false;
+			try {
+				previousProducts = localStorage.getItem(storageKey);
+				previousSales = localStorage.getItem(salesStorageKey);
+				snapshotsRead = true;
+				localStorage.setItem(salesStorageKey, JSON.stringify(updatedSales));
+				salesWritten = true;
+				localStorage.setItem(storageKey, JSON.stringify(updatedProducts));
+				productsWritten = true;
+				return true;
+			} catch {
+				let rollbackFailed = !snapshotsRead;
+				if (snapshotsRead) {
+					[
+						[salesStorageKey, previousSales, salesWritten],
+						[storageKey, previousProducts, productsWritten]
+					].forEach(([key, previousValue, wasWritten]) => {
+						if (!wasWritten) return;
+						try {
+							if (previousValue === null) localStorage.removeItem(key);
+							else localStorage.setItem(key, previousValue);
+						} catch {
+							rollbackFailed = true;
+						}
+					});
+				}
+				setSaleNotice(
+					rollbackFailed
+						? "No se pudo confirmar la venta y tampoco se pudo restaurar todo el almacenamiento. Recarga y verifica inventario e historial antes de reintentar."
+						: "No se pudo guardar la venta. No se confirmó la operación y el inventario se restauró.",
+					true
+				);
+				return false;
+			}
+		}
+
+		function completeSale(event) {
+			event.preventDefault();
+			if (!salesStorageAvailable || !saleForm.reportValidity()) return;
+			const customerFields = ["#saleCustomerName", "#saleCustomerNit", "#saleCustomerAddress"]
+				.map(selector => document.querySelector(selector));
+			const emptyCustomerField = customerFields.find(field => !field.value.trim());
+			if (emptyCustomerField) {
+				setSaleNotice("Completa el nombre, NIT y dirección del cliente.", true);
+				emptyCustomerField.focus();
+				return;
+			}
+			if (saleCart.length === 0) {
+				setSaleNotice("Agrega al menos un producto antes de registrar la venta.", true);
+				return;
+			}
+
+			for (const item of saleCart) {
+				const product = products.find(entry => entry.code === item.code);
+				if (!product || !Number.isSafeInteger(item.quantity) || item.quantity < 1 || item.quantity > product.stock) {
+					setSaleNotice(`La disponibilidad cambió para ${product?.name || item.code}. Revisa las cantidades antes de continuar.`, true);
+					renderSaleProducts();
+					renderSaleCart();
+					return;
+				}
+			}
+
+			const totals = getSaleTotals();
+			const invoiceNumber = sales.some(sale => sale.invoiceNumber === currentInvoiceNumber)
+				? generateInvoiceNumber()
+				: currentInvoiceNumber;
+			const sale = {
+				invoiceNumber,
+				createdAt: new Date().toISOString(),
+				company: { name: "Nathaly Shop", nit: "3012394280101" },
+				customer: {
+					name: document.querySelector("#saleCustomerName").value.trim(),
+					nit: document.querySelector("#saleCustomerNit").value.trim(),
+					address: document.querySelector("#saleCustomerAddress").value.trim(),
+					location: saleLocation ? { ...saleLocation } : null
+				},
+				items: saleCart.map(item => {
+					const product = products.find(entry => entry.code === item.code);
+					return {
+						productId: product.code,
+						productName: product.name,
+						quantity: item.quantity,
+						unitPrice: Number(product.price),
+						lineTotal: Number(product.price) * item.quantity
+					};
+				}),
+				totals,
+				vatRate: 0.12
+			};
+			const updatedProducts = products.map(product => {
+				const soldItem = saleCart.find(item => item.code === product.code);
+				return soldItem ? { ...product, stock: product.stock - soldItem.quantity } : product;
+			});
+			const updatedSales = [sale, ...sales];
+			if (!persistSale(updatedProducts, updatedSales)) return;
+
+			products = updatedProducts;
+			sales = updatedSales;
+			saleCart = [];
+			saleForm.reset();
+			currentInvoiceNumber = generateInvoiceNumber();
+			document.querySelector("#saleInvoiceNumber").value = currentInvoiceNumber;
+			renderInventory();
+			renderSaleProducts();
+			renderSaleCart();
+			renderSalesHistory();
+			renderInvoice(sale);
+			setSaleNotice(`Venta ${sale.invoiceNumber} registrada y existencias actualizadas.`);
 		}
 
 		function readImageAsDataUrl(file) {
@@ -888,9 +1601,209 @@
 			notice.classList.remove("error");
 		});
 
-		searchInput.addEventListener("input", renderInventory);
+		searchInputs.forEach(input => {
+			input.addEventListener("input", () => {
+				searchInputs.forEach(searchInput => {
+					if (searchInput !== input) searchInput.value = input.value;
+				});
+				renderInventory();
+			});
+		});
+
+		document.querySelector("#addSaleProduct").addEventListener("click", addSaleProduct);
+		saleProductSelect.addEventListener("change", () => {
+			const product = products.find(entry => entry.code === saleProductSelect.value);
+			saleProductQuantity.max = product ? String(product.stock) : "";
+			if (product && Number(saleProductQuantity.value) > product.stock) saleProductQuantity.value = String(product.stock);
+		});
+		saleForm.addEventListener("submit", completeSale);
+
+		const saleAddressInput = document.querySelector("#saleCustomerAddress");
+		const locationStatus = document.querySelector("#locationStatus");
+		const locationResults = document.querySelector("#locationResults");
+		const locationSearchInput = document.querySelector("#locationSearch");
+		const defaultMapCenter = [14.6349, -90.5069];
+		const nominatimUrl = "https://nominatim.openstreetmap.org";
+		let saleMap = null;
+		let saleMarker = null;
+		let saleLocation = null;
+		let geocodeRequestId = 0;
+
+		function setLocationStatus(message, isError = false) {
+			locationStatus.textContent = message;
+			locationStatus.style.color = isError ? "#b94731" : "";
+		}
+
+		function initSaleMap() {
+			if (saleMap) {
+				requestAnimationFrame(() => saleMap.invalidateSize({ pan: false }));
+				return true;
+			}
+			if (window.location.protocol === "file:") {
+				setLocationStatus("El mapa no funciona al abrir index.html directamente (file://): OpenStreetMap bloquea esas solicitudes. Abre NathalyShop desde un servidor local (http://localhost) o desde una página publicada.", true);
+				return false;
+			}
+			if (typeof L === "undefined") {
+				setLocationStatus("No se pudo cargar el mapa. Revisa tu conexión a internet; puedes escribir la dirección manualmente.", true);
+				return false;
+			}
+			const mapElement = document.querySelector("#saleMap");
+			if (!mapElement || mapElement.hidden || !mapElement.getClientRects().length) return false;
+			try {
+				saleMap = L.map(mapElement).setView(defaultMapCenter, 13);
+				const tileLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+					maxZoom: 19,
+					attribution: "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>"
+				}).addTo(saleMap);
+				tileLayer.on("tileerror", () => {
+					setLocationStatus("No se pudieron cargar los mosaicos del mapa. Revisa tu conexión; puedes escribir la dirección manualmente.", true);
+				});
+				saleMap.on("click", event => placeSaleMarker(event.latlng.lat, event.latlng.lng, { reverse: true }));
+				requestAnimationFrame(() => saleMap.invalidateSize({ pan: false }));
+				return true;
+			} catch (error) {
+				console.error("No se pudo inicializar el mapa de ventas.", error);
+				if (saleMap) saleMap.remove();
+				saleMap = null;
+				setLocationStatus("No se pudo inicializar el mapa. Puedes escribir la dirección manualmente.", true);
+				return false;
+			}
+		}
+
+		function placeSaleMarker(lat, lng, { reverse = false, zoom = false } = {}) {
+			if (!saleMap) return;
+			saleLocation = { lat, lng };
+			if (saleMarker) {
+				saleMarker.setLatLng([lat, lng]);
+			} else {
+				saleMarker = L.marker([lat, lng], { draggable: true, title: "Arrastra para ajustar la ubicación" }).addTo(saleMap);
+				saleMarker.on("dragend", () => {
+					const position = saleMarker.getLatLng();
+					placeSaleMarker(position.lat, position.lng, { reverse: true });
+				});
+			}
+			if (zoom) saleMap.setView([lat, lng], Math.max(saleMap.getZoom(), 17));
+			else saleMap.panTo([lat, lng]);
+			if (reverse) reverseGeocode(lat, lng);
+			else setLocationStatus("Ubicación fijada en el mapa.");
+		}
+
+		async function reverseGeocode(lat, lng) {
+			const requestId = ++geocodeRequestId;
+			setLocationStatus("Obteniendo la dirección del punto seleccionado...");
+			try {
+				const response = await fetch(`${nominatimUrl}/reverse?format=jsonv2&accept-language=es&lat=${lat}&lon=${lng}`);
+				if (!response.ok) throw new Error("Respuesta no válida");
+				const data = await response.json();
+				if (requestId !== geocodeRequestId) return;
+				if (!data.display_name) throw new Error("Sin dirección");
+				saleAddressInput.value = data.display_name.slice(0, 250);
+				setLocationStatus("Dirección completada desde el mapa. Puedes editarla si hace falta.");
+			} catch {
+				if (requestId !== geocodeRequestId) return;
+				setLocationStatus("Se fijó el punto, pero no se pudo obtener la dirección. Escríbela manualmente.", true);
+			}
+		}
+
+		async function searchLocation() {
+			const query = locationSearchInput.value.trim();
+			locationResults.replaceChildren();
+			locationResults.hidden = true;
+			if (!query) {
+				setLocationStatus("Escribe una dirección o lugar para buscar.", true);
+				return;
+			}
+			if (!initSaleMap()) return;
+			setLocationStatus("Buscando...");
+			try {
+				const response = await fetch(`${nominatimUrl}/search?format=jsonv2&accept-language=es&limit=5&q=${encodeURIComponent(query)}`);
+				if (!response.ok) throw new Error("Respuesta no válida");
+				const results = await response.json();
+				if (!Array.isArray(results) || results.length === 0) {
+					setLocationStatus("No se encontraron resultados. Prueba con otra búsqueda o marca el punto en el mapa.", true);
+					return;
+				}
+				results.forEach(result => {
+					const item = document.createElement("li");
+					const button = document.createElement("button");
+					button.type = "button";
+					button.textContent = result.display_name;
+					button.addEventListener("click", () => {
+						const lat = Number(result.lat);
+						const lng = Number(result.lon);
+						if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+						saleAddressInput.value = String(result.display_name).slice(0, 250);
+						geocodeRequestId++;
+						placeSaleMarker(lat, lng, { zoom: true });
+						locationResults.hidden = true;
+					});
+					item.append(button);
+					locationResults.append(item);
+				});
+				locationResults.hidden = false;
+				setLocationStatus("Selecciona un resultado de la lista.");
+			} catch {
+				setLocationStatus("No se pudo realizar la búsqueda. Revisa tu conexión o marca el punto en el mapa.", true);
+			}
+		}
+
+		document.querySelector("#locationSearchButton").addEventListener("click", searchLocation);
+		locationSearchInput.addEventListener("keydown", event => {
+			if (event.key !== "Enter") return;
+			event.preventDefault();
+			searchLocation();
+		});
+		document.querySelector("#locationCurrent").addEventListener("click", () => {
+			if (!initSaleMap()) return;
+			if (!navigator.geolocation) {
+				setLocationStatus("Este navegador no permite obtener la ubicación actual.", true);
+				return;
+			}
+			setLocationStatus("Solicitando permiso para obtener tu ubicación...");
+			navigator.geolocation.getCurrentPosition(
+				position => placeSaleMarker(position.coords.latitude, position.coords.longitude, { reverse: true, zoom: true }),
+				() => setLocationStatus("No se pudo obtener tu ubicación. Revisa los permisos o marca el punto manualmente.", true),
+				{ enableHighAccuracy: true, timeout: 15000 }
+			);
+		});
+		saleForm.addEventListener("reset", () => {
+			geocodeRequestId++;
+			saleLocation = null;
+			if (saleMarker) {
+				saleMarker.remove();
+				saleMarker = null;
+			}
+			locationResults.replaceChildren();
+			locationResults.hidden = true;
+			setLocationStatus("Haz clic en el mapa o arrastra el marcador para fijar la ubicación. Mapa © colaboradores de OpenStreetMap.");
+		});
+		window.saleMapReady = true;
+		if (window.location.hash === "#screen-sales") requestAnimationFrame(initSaleMap);
+
+		document.querySelector("#clearSale").addEventListener("click", () => {
+			saleForm.reset();
+			saleCart = [];
+			currentInvoiceNumber = generateInvoiceNumber();
+			document.querySelector("#saleInvoiceNumber").value = currentInvoiceNumber;
+			invoicePrint.hidden = true;
+			setSaleNotice("");
+			renderSaleProducts();
+			renderSaleCart();
+		});
+		salesHistoryRows.addEventListener("click", event => {
+			const printButton = event.target.closest("[data-invoice-number]");
+			if (!printButton) return;
+			const sale = sales.find(entry => entry.invoiceNumber === printButton.dataset.invoiceNumber);
+			if (sale) printSaleInvoice(sale);
+		});
+
+		currentInvoiceNumber = generateInvoiceNumber();
+		document.querySelector("#saleInvoiceNumber").value = currentInvoiceNumber;
 		renderCatalogs();
 		renderInventory();
+		renderSaleProducts();
+		renderSaleCart();
+		renderSalesHistory();
 	</script>
 </body>
 </html>
